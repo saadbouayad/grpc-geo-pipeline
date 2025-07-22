@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package sensor;
+
+option go_package = "grpc-geo-pipeline/pb;pb";
+service SensorService{
+    rpc SendSensorData (SensorData) returns (SensorResponse);
+}
+
+message SensorData {
+    string sensor_id = 1;
+    double latitude = 2;
+    double longitude = 3;
+    double temperature = 4;
+    string timestamp = 5;
+}
+
+message SensorResponse {
+    string message = 1; 
+}
