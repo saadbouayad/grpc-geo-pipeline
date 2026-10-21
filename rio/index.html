@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<title>Rio Picks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one column of postcard "tickets" grouped by neighborhood, azulejo-tile header band, sticky person switcher. */
+:root{
+  --sand:#F6F7F2; --card:#FFFFFF; --ink:#13304A; --muted:#5B6E7E; --line:#D9E1E6;
+  --tile:#1F5FA8; --tile-soft:#E3EDF8; --mango:#F29A1F; --mango-ink:#7A4300; --palm:#1E8A5A; --palm-soft:#E1F3EA;
+  --p-saad:#1F5FA8; --p-akshat:#C2417A; --p-rinki:#1E8A5A; --p-sabina:#D9761A;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --sand:#0E1A26; --card:#152536; --ink:#E8EEF3; --muted:#9AAEBE; --line:#26384A;
+  --tile:#6FA8E8; --tile-soft:#1A3350; --mango:#F5AE4A; --mango-ink:#FFD9A3; --palm:#4CC28B; --palm-soft:#16352A;
+  --p-saad:#6FA8E8; --p-akshat:#E880AE; --p-rinki:#4CC28B; --p-sabina:#F2A35A; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --sand:#0E1A26; --card:#152536; --ink:#E8EEF3; --muted:#9AAEBE; --line:#26384A;
+  --tile:#6FA8E8; --tile-soft:#1A3350; --mango:#F5AE4A; --mango-ink:#FFD9A3; --palm:#4CC28B; --palm-soft:#16352A;
+  --p-saad:#6FA8E8; --p-akshat:#E880AE; --p-rinki:#4CC28B; --p-sabina:#F2A35A; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--sand);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* azulejo band */
+.band{position:relative;overflow:hidden;background:var(--tile);color:#fff}
+.band canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.22}
+.band .wrap{position:relative;padding-block:28px 26px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(38px,9vw,60px);line-height:.95;margin:.2em 0 .25em;letter-spacing:-.02em;text-wrap:balance}
+h1 em{font-style:normal;color:#FFD27A}
+.lede{max-width:52ch;margin:0;font-size:16px;opacity:.95}
+.dates{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.dates span{font-size:13px;font-weight:600;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);padding:4px 10px;border-radius:999px}
+
+/* sticky picker */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sand)}
+.who{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sand);border-bottom:1px solid var(--line)}
+.who .wrap{padding-block:12px;display:flex;flex-direction:column;gap:10px}
+.who-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.who-label{font-size:13px;font-weight:600;color:var(--muted);margin-right:4px}
+.person{--c:var(--tile);font:inherit;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:7px;padding:7px 12px 7px 8px;border-radius:999px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.person .dot{width:22px;height:22px;border-radius:50%;background:var(--c);color:var(--card);display:grid;place-items:center;font-size:11px;font-weight:800}
+.person .n{font-weight:600;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.person[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}
+.person:focus-visible,.card:focus-visible,.tab:focus-visible,.btn:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+.tabs{display:flex;gap:6px}
+.tab{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border-radius:8px;border:0;background:transparent;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--sand)}
+.status{margin-left:auto;font-size:12px;color:var(--muted)}
+
+main .wrap{padding-block:18px 48px;display:flex;flex-direction:column;gap:28px}
+.hint{background:var(--tile-soft);border-radius:12px;padding:12px 14px;font-size:14px}
+.hint b{color:var(--tile)}
+
+section h2{font-family:var(--display);font-weight:700;font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
+section .sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}
+
+/* ticket card */
+.card{position:relative;text-align:left;font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:14px 14px 12px 18px;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-width:0;transition:transform .15s ease,border-color .15s}
+.card::before{content:"";position:absolute;left:-1.5px;top:14px;bottom:14px;width:0;border-left:2px dashed var(--line)}
+.card:hover{transform:translateY(-1px)}
+.card .top{display:flex;gap:8px;align-items:flex-start}
+.card h3{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.2;margin:0;flex:1;min-width:0}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.tag{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:var(--tile-soft);color:var(--tile)}
+.tag.when{background:var(--palm-soft);color:var(--palm)}
+.tag.warn{background:transparent;border:1px solid var(--mango);color:var(--mango-ink)}
+.check{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-weight:800;font-size:14px;color:transparent}
+.card[aria-pressed="true"]{border-color:var(--me)}
+.card[aria-pressed="true"] .check{background:var(--me);border-color:var(--me);color:var(--card)}
+.stamp{position:absolute;right:46px;top:8px;font-family:var(--display);font-weight:800;font-size:13px;letter-spacing:.08em;color:var(--me);border:2px solid var(--me);border-radius:6px;padding:0 6px;transform:rotate(-8deg);opacity:0}
+.card[aria-pressed="true"] .stamp{opacity:1;animation:stamp .25s ease-out}
+@keyframes stamp{from{transform:rotate(-8deg) scale(1.6);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:1}}
+.voters{display:flex;gap:4px;margin-top:4px;min-height:22px;align-items:center}
+.v{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;color:var(--card)}
+.voters .lbl{font-size:12px;color:var(--muted);margin-left:4px}
+
+/* tally */
+.tally{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.row .t{font-weight:700;min-width:0}
+.row .h{font-size:12px;color:var(--muted)}
+.row .vs{display:flex;gap:4px}
+.badge{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mango-ink);background:color-mix(in srgb,var(--mango) 22%,transparent);padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:2px}
+.empty{color:var(--muted);font-size:14px;padding:20px;text-align:center;border:1.5px dashed var(--line);border-radius:12px}
+.btn{font:inherit;font-weight:700;font-size:14px;padding:9px 14px;border-radius:10px;border:1.5px solid var(--ink);background:var(--ink);color:var(--sand);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+textarea{width:100%;font:inherit;font-size:14px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);resize:vertical;min-height:64px}
+label.note{font-weight:700;font-size:14px;display:block;margin-bottom:6px}
+.foot{color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:reduce){.card,.card[aria-pressed="true"] .stamp{transition:none;animation:none}}
+</style>
+
+<header class="band">
+  <canvas id="tiles" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="eyebrow">Brazil! · group picks</div>
+    <h1>What are you <em>in</em> for?</h1>
+    <p class="lede">Pick your name, then tap every card you'd actually show up for. When you're done, open Group tally, hit Copy, and paste it in the group chat. Saad turns the overlaps into a day-by-day plan grouped by neighborhood.</p>
+    <div class="dates"><span>Saad &amp; Akshat · Nov 19–26</span><span>Rinki &amp; Sabina · Nov 21–24</span><span>Base: Copacabana</span></div>
+  </div>
+</header>
+
+<div class="who">
+  <div class="wrap">
+    <div class="who-row" id="people" role="group" aria-label="Who's picking"><span class="who-label">I'm</span></div>
+    <div class="who-row">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-pick" aria-selected="true">Pick</button>
+        <button class="tab" role="tab" id="tab-tally" aria-selected="false">Group tally</button>
+      </div>
+      <span class="status" id="status" aria-live="polite"></span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap" id="pick-view">
+    <div class="hint" id="hint"><b>Start here:</b> tap your name above. Your picks stay saved on this phone, so you can come back and change them.</div>
+    <div id="sections" style="display:flex;flex-direction:column;gap:28px"></div>
+    <div>
+      <label class="note" for="note">Anything else? Must-dos, dealbreakers, food stuff</label>
+      <textarea id="note" placeholder="e.g. I'd love a snorkel day, no red meat for me, I'm out by midnight…"></textarea>
+    </div>
+  </div>
+  <div class="wrap" id="tally-view" hidden>
+    <div class="tally" id="tally"></div>
+    <div class="actions"><button class="btn" id="copy">Copy tally for the chat</button><span class="foot" id="copy-msg"></span></div>
+    <textarea id="copy-fallback" readonly hidden></textarea>
+  </div>
+</main>
+
+<script>
+const PEOPLE=[
+  {id:"saad",name:"Saad",c:"--p-saad"},
+  {id:"akshat",name:"Akshat",c:"--p-akshat"},
+  {id:"rinki",name:"Rinki",c:"--p-rinki"},
+  {id:"sabina",name:"Sabina",c:"--p-sabina"}];
+const HOODS=[
+  {id:"beach",name:"Copacabana, Ipanema & Leblon",sub:"Our home base. Sand, sunsets, easy walks."},
+  {id:"santa",name:"Santa Teresa & Lapa",sub:"Hilltop bohemia by day, samba by night. Pairs well in one trip."},
+  {id:"urca",name:"Urca",sub:"Sugarloaf and the sea wall. Best around sunset."},
+  {id:"jb",name:"Jardim Botânico & Lagoa",sub:"Green, shady and calm. Gardens, the lagoon, good restaurants."},
+  {id:"centro",name:"Centro & Saúde",sub:"Old Rio: history, botecos, and Monday's samba."},
+  {id:"up",name:"Up the mountain",sub:"Corcovado."},
+  {id:"out",name:"Beyond the city",sub:"Full-day trips."}];
+const A=[
+  {id:"beachday",h:"beach",t:"Lazy beach day",d:"Chairs, coconuts, mate gelado, a swim. Zero agenda.",w:"Any day",l:"All day"},
+  {id:"arpoador",h:"beach",t:"Arpoador sunset",d:"Climb the rock between Copacabana and Ipanema, applaud the sun like locals do.",w:"Evening",l:"1 hr"},
+  {id:"workout",h:"beach",t:"Beach workout or run",d:"Outdoor gym bars and the boardwalk along Copacabana, before it gets hot.",w:"Early morning",l:"1 hr"},
+  {id:"palace",h:"beach",t:"Churrascaria Palace",d:"Classic rodízio. Big buffet and chicken on the skewers, so it works for non-red-meat folks.",w:"Dinner",l:"2 hrs",x:"Go hungry"},
+  {id:"ipdrinks",h:"beach",t:"Drinks in Ipanema",d:"Caipirinhas and people-watching after dinner.",w:"Night",l:"2 hrs"},
+  {id:"boat",h:"beach",t:"Boat trip on Guanabara Bay",d:"See the city from the water, swim stop included on most trips.",w:"Daytime",l:"3–4 hrs"},
+  {id:"mineiro",h:"santa",t:"Feijoada at Bar do Mineiro",d:"Rio's Saturday ritual. Black bean stew with pork, best shared.",w:"Sat lunch",l:"1.5 hrs"},
+  {id:"tram",h:"santa",t:"Santa Teresa tram + Selarón Steps",d:"Ride the yellow tram, wander the hill, end on the tiled staircase.",w:"Afternoon",l:"2–3 hrs"},
+  {id:"lapa",h:"santa",t:"Lapa samba night",d:"Live samba bars under the arches. Late and loud.",w:"Sat night",l:"Late"},
+  {id:"aprazivel",h:"santa",t:"Lunch at Aprazível",d:"Garden restaurant on the hillside with city views. Hearts of palm cut at the table.",w:"Lunch",l:"2 hrs",x:"Closed Mon"},
+  {id:"tereze",h:"santa",t:"Térèze farewell dinner",d:"The splurge pick. Candlelit terrace over the city.",w:"Tue dinner",l:"2.5 hrs"},
+  {id:"sugarloaf",h:"urca",t:"Sugarloaf at golden hour",d:"Two cable cars up the granite peak, stay for sunset over the bay.",w:"Late afternoon",l:"2.5 hrs"},
+  {id:"urcabar",h:"urca",t:"Bar Urca on the sea wall",d:"Bolinhos de bacalhau and a cold beer, sitting on the wall facing the bay.",w:"Sunset",l:"1.5 hrs"},
+  {id:"garden",h:"jb",t:"Botanical Garden",d:"Imperial palm avenue, orchids, rainforest paths.",w:"Morning",l:"2 hrs"},
+  {id:"lage",h:"jb",t:"Parque Lage + lunch at Plage",d:"Mansion courtyard under Corcovado. Café in the pool courtyard.",w:"Late morning",l:"2 hrs",x:"Put name down early"},
+  {id:"escama",h:"jb",t:"Escama seafood dinner",d:"Raw bar, crudos and a lovely patio. Good for veg and non-veg alike.",w:"Dinner",l:"2 hrs",x:"Closed Mon"},
+  {id:"pedra",h:"centro",t:"Pedra do Sal samba roda",d:"Monday-night samba in the old port, street food and caipirinhas on the steps.",w:"Mon night",l:"3 hrs",x:"Leave valuables"},
+  {id:"amarelinho",h:"centro",t:"Amarelinho da Cinelândia",d:"Historic boteco facing the Municipal Theatre. Good pre-Pedra do Sal stop.",w:"Lunch or dinner",l:"1.5 hrs"},
+  {id:"foodtour",h:"centro",t:"Centro food tour",d:"Guided walk through markets and botecos with local history. Lots of small bites.",w:"Daytime",l:"3–4 hrs"},
+  {id:"colombo",h:"centro",t:"Coffee at Confeitaria Colombo",d:"Ornate 1894 café with mirrors and pastries.",w:"Morning",l:"1 hr"},
+  {id:"favela",h:"centro",t:"Vetted favela tour",d:"Community-run tour with a local guide.",w:"Morning",l:"3 hrs"},
+  {id:"cristo",h:"up",t:"Christ the Redeemer",d:"First cog train up on a weekday morning, before the crowds and clouds.",w:"Early weekday",l:"3 hrs",x:"Avoid Sunday"},
+  {id:"snorkel",h:"out",t:"Snorkel day at Arraial do Cabo",d:"Clear turquoise water and the best snorkeling near Rio.",w:"Full day",l:"~3 hrs drive each way"}];
+const byId=Object.fromEntries(A.map(a=>[a.id,a]));
+const initials=n=>n.slice(0,1);
+const col=p=>`var(${p.c})`;
+
+let me=null, picks={}, notes={}, db=null, saveT=null, local=false;
+PEOPLE.forEach(p=>{picks[p.id]=[];notes[p.id]="";});
+try{ me=localStorage.getItem("rio-me")||null; }catch(e){}
+
+const $=s=>document.querySelector(s);
+const status=t=>{$("#status").textContent=t};
+
+function renderPeople(){
+  const box=$("#people"); box.querySelectorAll(".person").forEach(e=>e.remove());
+  PEOPLE.forEach(p=>{
+    const b=document.createElement("button");
+    b.className="person"; b.style.setProperty("--c",col(p)); b.setAttribute("aria-pressed",me===p.id);
+    b.innerHTML=`<span class="dot">${initials(p.name)}</span>${p.name}<span class="n">${picks[p.id].length||""}</span>`;
+    b.onclick=()=>{me=p.id;try{localStorage.setItem("rio-me",me)}catch(e){};$("#note").value=notes[me]||"";render();};
+    box.appendChild(b);
+  });
+}
+function votersOf(aid){return PEOPLE.filter(p=>picks[p.id].includes(aid))}
+function voterDots(vs){return vs.map(p=>`<span class="v" style="background:${col(p)}" title="${p.name}">${initials(p.name)}</span>`).join("")}
+
+function renderCards(){
+  const meP=PEOPLE.find(p=>p.id===me);
+  document.body.style.setProperty("--me",meP?col(meP):"var(--tile)");
+  $("#hint").hidden=!!me;
+  const s=$("#sections"); s.innerHTML="";
+  HOODS.forEach(h=>{
+    const items=A.filter(a=>a.h===h.id); if(!items.length)return;
+    const sec=document.createElement("section");
+    sec.innerHTML=`<h2>${h.name}</h2><p class="sub">${h.sub}</p><div class="grid"></div>`;
+    const g=sec.querySelector(".grid");
+    items.forEach(a=>{
+      const on=me&&picks[me].includes(a.id), vs=votersOf(a.id);
+      const c=document.createElement("button");
+      c.className="card"; c.setAttribute("aria-pressed",!!on);
+      c.innerHTML=`<span class="stamp">I'M IN</span><div class="top"><h3>${a.t}</h3><span class="check">✓</span></div>
+        <p>${a.d}</p><div class="tags"><span class="tag when">${a.w}</span><span class="tag">${a.l}</span>${a.x?`<span class="tag warn">${a.x}</span>`:""}</div>
+        <div class="voters">${voterDots(vs)}${vs.length===4?'<span class="lbl">Everyone!</span>':vs.length?`<span class="lbl">${vs.length} in</span>`:'<span class="lbl">No takers yet</span>'}</div>`;
+      c.onclick=()=>toggle(a.id);
+      g.appendChild(c);
+    });
+    s.appendChild(sec);
+  });
+}
+function renderTally(){
+  const rows=A.map(a=>({a,vs:votersOf(a.id)})).filter(r=>r.vs.length).sort((x,y)=>y.vs.length-x.vs.length);
+  const t=$("#tally");
+  if(!rows.length){t.innerHTML='<div class="empty">No picks yet. Once people tap cards, the overlaps show up here, most popular first.</div>';return;}
+  t.innerHTML=rows.map(({a,vs})=>`<div class="row"><div style="min-width:0"><div class="t">${a.t}${vs.length===4?'<span class="badge">All 4</span>':""}</div><div class="h">${HOODS.find(h=>h.id===a.h).name} · ${a.w}</div></div><div class="vs">${voterDots(vs)}</div></div>`).join("")
+   + PEOPLE.filter(p=>notes[p.id]).map(p=>`<div class="row"><div style="min-width:0"><div class="t">${p.name}'s note</div><div class="h" style="font-size:14px;color:var(--ink)">${esc(notes[p.id])}</div></div><div class="vs">${voterDots([p])}</div></div>`).join("");
+}
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function render(){renderPeople();renderCards();renderTally();}
+
+function toggle(aid){
+  if(!me){status("Tap your name first");$("#people").scrollIntoView({block:"nearest"});return;}
+  const l=picks[me]; const i=l.indexOf(aid); i>=0?l.splice(i,1):l.push(aid);
+  render(); queueSave();
+}
+$("#note").addEventListener("input",e=>{if(!me)return;notes[me]=e.target.value;queueSave();});
+
+function queueSave(){
+  status("Saving…"); clearTimeout(saveT);
+  const who=me, data={name:PEOPLE.find(p=>p.id===who).name,picks:[...picks[who]],note:notes[who]||"",updated:Date.now()};
+  saveT=setTimeout(async()=>{
+    if(db){
+      try{await db.collection("picks").doc(who).set(data);status("Saved");}
+      catch(e){status(e&&e.code==="permission_denied"?"You can view but not save. Ask Saad for edit access.":"Couldn't save. Check your connection and tap again.");}
+    }else{
+      try{localStorage.setItem("rio-picks",JSON.stringify({picks,notes}));}catch(e){}
+      status("Saved on this device only. Use Copy tally to share.");
+    }
+  },700);
+}
+
+function tallyText(){
+  const rows=A.map(a=>({a,vs:votersOf(a.id)})).filter(r=>r.vs.length).sort((x,y)=>y.vs.length-x.vs.length);
+  return "Rio picks 🇧🇷\n"+rows.map(r=>`${r.a.t}: ${r.vs.map(p=>p.name).join(", ")}`).join("\n")
+    +PEOPLE.filter(p=>notes[p.id]).map(p=>`\n${p.name}: ${notes[p.id]}`).join("");
+}
+$("#copy").onclick=()=>{
+  const txt=tallyText();
+  navigator.clipboard.writeText(txt).then(()=>{$("#copy-msg").textContent="Copied. Paste it in the group chat."})
+   .catch(()=>{const f=$("#copy-fallback");f.hidden=false;f.value=txt;f.select();$("#copy-msg").textContent="Select and copy the text below.";});
+};
+function tab(which){
+  $("#tab-pick").setAttribute("aria-selected",which==="pick");$("#tab-tally").setAttribute("aria-selected",which==="tally");
+  $("#pick-view").hidden=which!=="pick";$("#tally-view").hidden=which!=="tally";
+}
+$("#tab-pick").onclick=()=>tab("pick");$("#tab-tally").onclick=()=>tab("tally");
+
+/* azulejo pattern */
+(function(){const cv=$("#tiles"),x=cv.getContext("2d");function draw(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;x.scale(d,d);x.strokeStyle="#fff";x.lineWidth=1.5;const s=44;for(let i=0;i<r.width/s+1;i++)for(let j=0;j<r.height/s+1;j++){const cx=i*s,cy=j*s;x.strokeRect(cx,cy,s,s);x.beginPath();x.arc(cx+s/2,cy+s/2,s/4,0,7);x.stroke();x.beginPath();x.moveTo(cx,cy+s/2);x.quadraticCurveTo(cx+s/2,cy+s/2-10,cx+s/2,cy);x.moveTo(cx+s,cy+s/2);x.quadraticCurveTo(cx+s/2,cy+s/2+10,cx+s/2,cy+s);x.stroke();}}draw();addEventListener("resize",draw);})();
+
+if(me) $("#note").value="";
+render();
+try{const s=JSON.parse(localStorage.getItem("rio-picks")||"null");if(s){/* used only if db is unavailable */window.__localSeed=s;}}catch(e){}
+
+(async()=>{
+  const c=window.claude; db=c&&c.use?await c.use("db"):null;
+  if(!db){
+    local=true;
+    if(window.__localSeed){Object.assign(picks,window.__localSeed.picks||{});Object.assign(notes,window.__localSeed.notes||{});}
+    if(me)$("#note").value=notes[me]||"";
+    status("Picks save on this device. Use Copy tally to share.");render();return;
+  }
+  db.collection("picks").onSnapshot(snap=>{
+    snap.docs.forEach(d=>{const v=d.data();const p=PEOPLE.find(p=>p.name===v.name);if(!p)return;
+      if(p.id===me&&saveT&&status&&$("#status").textContent==="Saving…")return;
+      picks[p.id]=Array.isArray(v.picks)?v.picks.filter(id=>byId[id]):[];notes[p.id]=v.note||"";});
+    if(me&&document.activeElement!==$("#note"))$("#note").value=notes[me]||"";
+    render();
+  },()=>status("Lost the live connection. Reload to see new picks."));
+})();
+</script>
+
+</body></html>
